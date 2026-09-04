@@ -1,0 +1,2038 @@
+{
+  "info": {
+    "name": "Seguros LAFISE - Emision de Polizas de Auto",
+    "description": "Coleccion completa del modulo de emision: CRUD de clientes, coberturas y vehiculos, emision de polizas y reglas de validacion.\n\nAjuste la variable `baseUrl` si la API corre en otro puerto.\n\nLas carpetas estan numeradas para ejecutarse en orden con el Collection Runner: las carpetas de CRUD generan datos unicos por corrida (identificacion, nombre de cobertura y placa aleatorios), de modo que la coleccion se puede repetir sin limpiar la base. La carpeta 5 depende de que la 4 haya emitido la poliza.\n\nNinguna peticion usa una placa fija. Las de la carpeta 3 (CRUD de vehiculos) llevan el prefijo QA y las de la carpeta 4 (emision) el prefijo PO, de modo que en GET /api/vehiculos se distingue de un vistazo que carpeta creo cada vehiculo. Las placas con formato invalido de la carpeta 5 se rechazan antes de registrar nada, por lo que no dejan filas sueltas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "b32b6d94-a505-579b-ab57-121116928a6d"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5199",
+      "type": "string"
+    },
+    {
+      "key": "policyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "policyNumber",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdCustomerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdCoverageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdVehicleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoIdentification",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoRuc",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoCoverageName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoPlate",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdVehiclePlate",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoPolicyPlate",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "expectedPolicyPlate",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "issuedPlate",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Clientes (CRUD)",
+      "item": [
+        {
+          "id": "4790773c-ed21-5cbb-b82f-0c1bee0c025f",
+          "name": "GET - Listar clientes activos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "description": "El parametro onlyActive=false incluye los clientes dados de baja."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b3bd9506-f8d1-5a8b-a801-7e574fd1ccaa",
+          "name": "GET - Listar clientes incluyendo dados de baja",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes?onlyActive=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "onlyActive",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "4d2906d4-d7a4-5125-b276-0848cee98566",
+          "name": "GET - Obtener cliente por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6b8b2b16-45c5-56c9-a945-8fb63d6136fc",
+          "name": "POST - Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jose Ramon Silva\",\n  \"identificationNumber\": \"{{demoIdentification}}\",\n  \"email\": \"jose.silva@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Genera una identificacion unica por corrida para poder repetir la coleccion."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Cedula nicaraguense valida y unica por corrida: NNN-DDMMAA-NNNNL.",
+                  "// El municipio y la fecha de nacimiento se dejan fijos y validos; la variacion",
+                  "// viene del numero de produccion (4 digitos) y de la letra de control (A-X),",
+                  "// lo que da 240.000 combinaciones y hace practicamente imposible chocar.",
+                  "var produccion = String(Math.floor(Math.random() * 10000)).padStart(4, '0');",
+                  "var letras = 'ABCDEFGHIJKLMNOPQRSTUVWX';",
+                  "var letra = letras.charAt(Math.floor(Math.random() * letras.length));",
+                  "var cedula = '001-010190-' + produccion + letra;",
+                  "pm.collectionVariables.set('demoIdentification', cedula);",
+                  "console.log('Cedula generada para esta corrida: ' + cedula);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Incluye cabecera Location', () => pm.response.to.have.header('Location'));",
+                  "var body = pm.response.json();",
+                  "pm.test('Nace activo', () => pm.expect(body.isActive).to.be.true);",
+                  "pm.test('Devuelve la cedula normalizada', () => pm.expect(body.identificationNumber).to.eql(pm.collectionVariables.get('demoIdentification')));",
+                  "pm.collectionVariables.set('createdCustomerId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "4fee8609-d2bd-55dc-a74f-c1e551734cbf",
+          "name": "PUT - Actualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{createdCustomerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{createdCustomerId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jose Ramon Silva Mendez\",\n  \"identificationNumber\": \"{{demoIdentification}}\",\n  \"email\": \"jose.silva.mendez@example.com\",\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aplica el cambio', () => pm.expect(pm.response.json().name).to.eql('Jose Ramon Silva Mendez'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "7fd83c15-b517-54c1-9259-35c480e945fb",
+          "name": "PUT - Conflicto: identificacion de otro cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{createdCustomerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{createdCustomerId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jose Ramon Silva Mendez\",\n  \"identificationNumber\": \"001-120589-1002B\",\n  \"email\": \"jose.silva.mendez@example.com\",\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "001-120589-1002B pertenece al cliente semilla 1."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo CUSTOMER_ALREADY_EXISTS', () => pm.expect(pm.response.json().code).to.eql('CUSTOMER_ALREADY_EXISTS'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "52fa2158-d489-5779-aa65-10622cd191f8",
+          "name": "DELETE - Dar de baja cliente (baja logica)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{createdCustomerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{createdCustomerId}}"
+              ]
+            },
+            "description": "Devuelve 204. La fila se conserva; el cliente queda con isActive=false."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "8ca9f503-d74c-5aaf-9b38-3f1f912ce450",
+          "name": "DELETE - Idempotente: repetir la baja",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{createdCustomerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{createdCustomerId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "bc7cb590-6def-5e5d-aae4-4e2de393e1fa",
+          "name": "GET - El cliente dado de baja sigue existiendo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/{{createdCustomerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "{{createdCustomerId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Quedo inactivo', () => pm.expect(pm.response.json().isActive).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "e8e5cc46-5357-5029-832c-59608e959506",
+          "name": "POST - 400 identificacion con formato invalido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Identificacion Invalida\",\n  \"identificationNumber\": \"12345\",\n  \"email\": \"invalida@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "La cedula debe seguir el formato NNN-DDMMAA-NNNNL o ser un RUC juridico."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INVALID_IDENTIFICATION_FORMAT', () => pm.expect(pm.response.json().code).to.eql('INVALID_IDENTIFICATION_FORMAT'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6cb43b1e-b0c0-527b-9f5e-93a0866f5610",
+          "name": "POST - 400 fecha de nacimiento inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nacido El 30 De Febrero\",\n  \"identificationNumber\": \"281-300294-0022V\",\n  \"email\": \"imposible@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Encaja en el patron pero el 30 de febrero no existe."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INVALID_IDENTIFICATION_FORMAT', () => pm.expect(pm.response.json().code).to.eql('INVALID_IDENTIFICATION_FORMAT'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a4450960-4542-59f9-9c23-bef3f59a89ad",
+          "name": "POST - 409 la misma cedula en minusculas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Duplicado Con Minusculas\",\n  \"identificationNumber\": \"001-120589-1002b\",\n  \"email\": \"duplicado@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "001-120589-1002B pertenece al cliente semilla 1. La API normaliza a mayusculas, asi que la minuscula no crea un cliente nuevo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo CUSTOMER_ALREADY_EXISTS', () => pm.expect(pm.response.json().code).to.eql('CUSTOMER_ALREADY_EXISTS'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "60d6754b-ebb4-5bf0-8453-0c844b3cf8df",
+          "name": "POST - RUC juridico de una empresa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ferreteria El Martillo S.A.\",\n  \"identificationNumber\": \"{{demoRuc}}\",\n  \"email\": \"ventas@martillo.example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "El enunciado pide aceptar DNI/RUC: las empresas se identifican con RUC."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// RUC juridico unico por corrida: una letra y 13 digitos.",
+                  "var digitos = String(Math.floor(Math.random() * 1000000000000)).padStart(13, '0');",
+                  "pm.collectionVariables.set('demoRuc', 'J' + digitos);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a40330e1-88cb-5624-b5a2-e1aaa04c59eb",
+          "name": "DELETE - 404 cliente inexistente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "d7195967-0e88-58b3-b1ca-f5f542a69947"
+    },
+    {
+      "name": "2. Coberturas (CRUD)",
+      "item": [
+        {
+          "id": "1ca4c5d4-b22d-5f2b-8f5a-03ac3a18fd1f",
+          "name": "GET - Listar coberturas activas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todas estan activas', () => pm.response.json().forEach(c => pm.expect(c.isActive).to.be.true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "2a9758e2-5886-54c7-a9f8-206b927d4093",
+          "name": "GET - Listar coberturas incluyendo descontinuadas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas?onlyActive=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas"
+              ],
+              "query": [
+                {
+                  "key": "onlyActive",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye alguna inactiva', () => pm.expect(pm.response.json().some(c => !c.isActive)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3cda2123-58fc-5626-837f-8ad75bdeaf76",
+          "name": "GET - Obtener cobertura por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas",
+                "1"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Expone la tasa', () => pm.expect(pm.response.json().rate).to.be.a('number'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "93573e52-ff4b-5c9f-b719-9f11d9065f19",
+          "name": "POST - Crear cobertura",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{demoCoverageName}}\",\n  \"description\": \"Cobertura creada por la coleccion de Postman.\",\n  \"rate\": 1.4,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('demoCoverageName', 'Cobertura Demo ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "var body = pm.response.json();",
+                  "pm.test('Conserva la tasa enviada', () => pm.expect(body.rate).to.eql(1.4));",
+                  "pm.collectionVariables.set('createdCoverageId', body.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "e3965db8-d22c-52dd-95b4-3c30a9a89864",
+          "name": "PUT - Actualizar cobertura",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas/{{createdCoverageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas",
+                "{{createdCoverageId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{demoCoverageName}}\",\n  \"description\": \"Tasa ajustada por la coleccion de Postman.\",\n  \"rate\": 1.75,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Cambiar la tasa no altera las polizas ya emitidas: cada una conserva su appliedRate."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aplica la nueva tasa', () => pm.expect(pm.response.json().rate).to.eql(1.75));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "43403545-5bf6-5110-8ae4-17ceea13904f",
+          "name": "POST - Conflicto: nombre de cobertura repetido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Robo\",\n  \"rate\": 2.5,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo COVERAGE_ALREADY_EXISTS', () => pm.expect(pm.response.json().code).to.eql('COVERAGE_ALREADY_EXISTS'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "de5aec84-64f0-5ea7-8b46-bee2d50d84c1",
+          "name": "DELETE - Descontinuar cobertura (baja logica)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas/{{createdCoverageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas",
+                "{{createdCoverageId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "16d50abd-c748-5cd6-bd9a-79dbf9dc5698",
+          "name": "GET - 404 cobertura inexistente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coberturas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "coberturas",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "b75a27f7-fe49-5e2a-b499-27a6d001efd8"
+    },
+    {
+      "name": "3. Vehiculos (CRUD)",
+      "item": [
+        {
+          "id": "b8465432-aabc-5555-8922-29d016898067",
+          "name": "GET - Listar vehiculos activos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a1e41744-d4ab-53f6-befc-f471cb2e247a",
+          "name": "POST - Crear vehiculo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"{{demoPlate}}\",\n  \"brand\": \"Kia\",\n  \"model\": \"Rio\",\n  \"year\": 2021,\n  \"commercialValue\": 9000,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Placa unica por corrida con el formato exigido: 1-3 letras + 3-6 digitos.",
+                  "// Se usa 'var' y no 'const': si el sandbox de Postman reutiliza el contexto entre",
+                  "// ejecuciones, un 'const' repetido lanza SyntaxError, el script no llega a asignar",
+                  "// la variable y la peticion se enviaria con el valor anterior (placa equivocada).",
+                  "// El prefijo QA identifica los datos que crea esta coleccion.",
+                  "var digits = Math.floor(Math.random() * 900000) + 100000;",
+                  "var generatedPlate = 'QA' + digits;",
+                  "pm.collectionVariables.set('demoPlate', generatedPlate);",
+                  "console.log('Placa generada para esta corrida: ' + generatedPlate);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "var body = pm.response.json();",
+                  "pm.collectionVariables.set('createdVehicleId', body.id);",
+                  "// Se guarda la placa TAL COMO la devolvio la API; las peticiones siguientes",
+                  "// la reutilizan desde aqui y no dependen del script de pre-request.",
+                  "pm.collectionVariables.set('createdVehiclePlate', body.plate);",
+                  "pm.test('Devuelve la placa que se envio', () => pm.expect(body.plate).to.eql(pm.collectionVariables.get('demoPlate').toUpperCase()));",
+                  "pm.test('La placa generada respeta el formato QA + 6 digitos', () => pm.expect(body.plate).to.match(/^QA[0-9]{6}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "2950ddcb-dab4-52c1-ba32-461137961c2d",
+          "name": "GET - Obtener vehiculo por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos/{{createdVehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos",
+                "{{createdVehicleId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a88e43f6-e487-5173-8da3-5e7b1d820317",
+          "name": "PUT - Actualizar vehiculo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos/{{createdVehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos",
+                "{{createdVehicleId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"{{createdVehiclePlate}}\",\n  \"brand\": \"Kia\",\n  \"model\": \"Rio Sedan\",\n  \"year\": 2021,\n  \"commercialValue\": 8500,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aplica el nuevo valor comercial', () => pm.expect(pm.response.json().commercialValue).to.eql(8500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "d728cc91-f54c-5851-b39c-70ed642b39e4",
+          "name": "POST - 400 placa con formato invalido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"1234-XY\",\n  \"brand\": \"Nissan\",\n  \"model\": \"Sentra\",\n  \"year\": 2020,\n  \"commercialValue\": 5000,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INVALID_PLATE_FORMAT', () => pm.expect(pm.response.json().code).to.eql('INVALID_PLATE_FORMAT'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f879fdc6-a063-53b5-a529-70d0eb9022ce",
+          "name": "POST - 409 placa ya registrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plate\": \"{{createdVehiclePlate}}\",\n  \"brand\": \"Kia\",\n  \"model\": \"Rio\",\n  \"year\": 2021,\n  \"commercialValue\": 9000,\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Reutiliza la placa que devolvio el POST anterior."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo VEHICLE_ALREADY_EXISTS', () => pm.expect(pm.response.json().code).to.eql('VEHICLE_ALREADY_EXISTS'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3bacdec8-f798-5038-b190-a64cfa913727",
+          "name": "DELETE - Dar de baja vehiculo (baja logica)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos/{{createdVehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos",
+                "{{createdVehicleId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b6de00c9-0dc3-5811-8e10-95c69b9132cf",
+          "name": "GET - 404 vehiculo inexistente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/vehiculos/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "vehiculos",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "d78a1899-32ed-5721-b0e6-31aa5e47ea3b"
+    },
+    {
+      "name": "4. Emision",
+      "item": [
+        {
+          "id": "764b2c71-5c57-5f4b-8b87-9f24d7be0978",
+          "name": "POST - Emitir poliza (valida)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"vehicle\": {\n    \"plate\": \"{{demoPolicyPlate}}\",\n    \"brand\": \"Toyota\",\n    \"model\": \"Corolla\",\n    \"year\": 2022,\n    \"commercialValue\": 20000\n  },\n  \"coverageIds\": [\n    1,\n    2\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Robo (2.50%) + Choque (3.25%) sobre 20,000.00 => prima total 1,150.00.\nLa prima se calcula en el servidor; el cliente no la envia.\n\nLa placa se genera con el prefijo PO y se envia con un guion, para comprobar que el servidor la normaliza. Generarla es lo que permite repetir la coleccion: con una placa fija, la segunda corrida chocaria con la regla de una sola poliza activa por cliente y placa (409).\n\nLa prima no depende de la placa ni del cliente, solo del valor comercial (20,000.00) y de las tasas de las coberturas 1 y 2, asi que la asercion de 1,150.00 sigue siendo valida en cada corrida."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Placa unica por corrida, enviada con guion para probar la normalizacion.",
+                  "var digits = Math.floor(Math.random() * 900000) + 100000;",
+                  "pm.collectionVariables.set('demoPolicyPlate', 'PO-' + digits);",
+                  "pm.collectionVariables.set('expectedPolicyPlate', 'PO' + digits);",
+                  "console.log('Placa a asegurar en esta corrida: PO-' + digits);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Incluye cabecera Location', () => pm.response.to.have.header('Location'));",
+                  "var body = pm.response.json();",
+                  "pm.test('Calcula la prima en el servidor', () => pm.expect(body.totalPremium).to.eql(1150.00));",
+                  "pm.test('Normaliza la placa quitando el guion', () => pm.expect(body.vehicle.plate).to.eql(pm.collectionVariables.get('expectedPolicyPlate')));",
+                  "pm.test('Nace activa', () => pm.expect(body.status).to.eql('Active'));",
+                  "pm.collectionVariables.set('policyId', body.id);",
+                  "pm.collectionVariables.set('policyNumber', body.policyNumber);",
+                  "// La carpeta 5 reutiliza esta placa para provocar el 409 de poliza duplicada.",
+                  "pm.collectionVariables.set('issuedPlate', body.vehicle.plate);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "1d87e9fc-9b4c-50ed-911f-83696f7382b8",
+          "name": "GET - Consultar poliza por id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/{{policyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "{{policyId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el desglose de coberturas', () => pm.expect(pm.response.json().coverages).to.be.an('array').that.is.not.empty);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "0bd15bb0-6ef4-5866-bb32-01d6105160b8",
+          "name": "GET - Historial de polizas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "46a53868-0fa1-5a9e-9a70-dadbc04c3d27"
+    },
+    {
+      "name": "5. Reglas de validacion",
+      "item": [
+        {
+          "id": "68c5df8a-cb4f-5da5-8d3e-5436876f73c7",
+          "name": "409 - Poliza activa duplicada para la misma placa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"vehicle\": {\n    \"plate\": \"{{issuedPlate}}\",\n    \"brand\": \"Toyota\",\n    \"model\": \"Corolla\",\n    \"year\": 2022,\n    \"commercialValue\": 20000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Ejecutar despues de la carpeta 4: reutiliza la placa que esa carpeta acaba de asegurar para el cliente 1."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo DUPLICATE_ACTIVE_POLICY', () => pm.expect(pm.response.json().code).to.eql('DUPLICATE_ACTIVE_POLICY'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3e54c3f4-64a8-51d1-8729-3b1bfb98f35e",
+          "name": "400 - Vehiculo con mas de 20 anios",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"ABC1234\",\n    \"brand\": \"Nissan\",\n    \"model\": \"Sentra\",\n    \"year\": 1999,\n    \"commercialValue\": 5000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo VEHICLE_TOO_OLD', () => pm.expect(pm.response.json().code).to.eql('VEHICLE_TOO_OLD'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "d9ebd667-ffd6-5ab1-8ba2-a95b99203126",
+          "name": "400 - Placa con formato invalido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"1234-XY\",\n    \"brand\": \"Nissan\",\n    \"model\": \"Sentra\",\n    \"year\": 2020,\n    \"commercialValue\": 5000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INVALID_PLATE_FORMAT', () => pm.expect(pm.response.json().code).to.eql('INVALID_PLATE_FORMAT'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "acd32612-3d2b-5278-9ea0-ddbc27ff5ef5",
+          "name": "400 - Placa vacia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"\",\n    \"brand\": \"Nissan\",\n    \"model\": \"Sentra\",\n    \"year\": 2020,\n    \"commercialValue\": 5000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Lo rechaza DataAnnotations antes de llegar al servicio."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6c63cac5-be9f-5e03-8d51-bdd9a2d5c3ca",
+          "name": "400 - Valor comercial cero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 0\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6cc9b648-e80d-5346-9318-75ebb4fd3567",
+          "name": "400 - Cliente dado de baja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{createdCustomerId}}\",\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 9000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Usa el cliente que la carpeta 1 dio de baja."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INACTIVE_CUSTOMER', () => pm.expect(pm.response.json().code).to.eql('INACTIVE_CUSTOMER'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "7b94035b-5358-5bee-936b-87789cfc5354",
+          "name": "400 - Cobertura inactiva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 9000\n  },\n  \"coverageIds\": [\n    1,\n    6\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "La cobertura 6 (Asistencia Vial) esta descontinuada en el catalogo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Codigo INACTIVE_COVERAGE', () => pm.expect(pm.response.json().code).to.eql('INACTIVE_COVERAGE'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a7223828-1f91-5ef1-a069-87d5f272e486",
+          "name": "400 - Sin coberturas seleccionadas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 9000\n  },\n  \"coverageIds\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "5b246c55-efc4-5a30-a1cb-621504811437",
+          "name": "404 - Cliente inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 999999,\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 9000\n  },\n  \"coverageIds\": [\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "2f1cbb3c-6bfe-5a72-8088-6030907dd62e",
+          "name": "404 - Cobertura inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/emitir",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "emitir"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 2,\n  \"vehicle\": {\n    \"plate\": \"XY4321\",\n    \"brand\": \"Kia\",\n    \"model\": \"Rio\",\n    \"year\": 2021,\n    \"commercialValue\": 9000\n  },\n  \"coverageIds\": [\n    1,\n    999\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6df20a54-e713-5fcb-ac84-b4ea5d557910",
+          "name": "404 - Poliza inexistente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/polizas/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "polizas",
+                "999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "6235058a-24c7-5083-a270-084277fae060",
+          "name": "409 - Baja de cliente con polizas activas",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "clientes",
+                "1"
+              ]
+            },
+            "description": "El cliente 1 tiene la poliza emitida en la carpeta 4."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Codigo CUSTOMER_HAS_ACTIVE_POLICIES', () => pm.expect(pm.response.json().code).to.eql('CUSTOMER_HAS_ACTIVE_POLICIES'));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "id": "764ab499-9de9-58d7-a5c6-d220ea6b8990"
+    }
+  ]
+}
