@@ -1,0 +1,26 @@
+# Normaliza los finales de línea: en el repositorio siempre LF, en el working copy
+# lo que corresponda al sistema operativo. Evita diffs completos entre Windows y Linux.
+* text=auto
+
+*.cs        text diff=csharp
+*.csproj    text
+*.sln       text eol=crlf
+*.props     text
+*.targets   text
+*.json      text
+*.md        text
+*.sql       text
+*.ps1       text eol=crlf
+*.sh        text eol=lf
+*.yml       text
+*.gitignore text
+
+# Binarios: nunca tocar.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.dll  binary
+*.exe  binary
